@@ -30,7 +30,7 @@ def on_press(key):
     pressed_keys.add(key)   #הוספת לסט
 
     # בדיקה: אם קטרול וקיו נלחצים-לעצירה
-    if Key.ctrl_l in pressed_keys and KeyCode.from_char('q') in pressed_keys:
+    if Key.ctrl_l in pressed_keys and (KeyCode.from_char('q')or KeyCode.from_char('/')) in pressed_keys:
         # print("Ctrl + Q pressed - stop listener")
         listener.stop()
 
