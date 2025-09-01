@@ -1,6 +1,7 @@
 from pynput.keyboard import Key, KeyCode, Listener
 
 
+
 '''התוכנית הזו:
 1.עוקבת אחרי ההקשות,והשחרור (באמצעות ספריית פיינפוט)
 2.דואגת שהפלט יצא נקי מהספרייה,ללא סימנים מיותרים(באמצעות הגדרת מילון"מקשים מיוחדים", והחלפה שלהם..וכו)
@@ -29,10 +30,12 @@ pressed_keys = set()
 def on_press(key):
     pressed_keys.add(key)   #הוספת לסט
 
+
     # בדיקה: אם קטרול וקיו נלחצים-לעצירה
-    if Key.ctrl_l in pressed_keys and (KeyCode.from_char('q')or KeyCode.from_char('/')) in pressed_keys:
+    if Key.ctrl_l in pressed_keys and (KeyCode.from_char('q') or  KeyCode.from_char('/')) in pressed_keys:
         # print("Ctrl + Q pressed - stop listener")
         listener.stop()
+
 
     #  "ניקוי,וסידור": הפלט כמפורט להלן:
     key = special_keys.get(str(key), key)  # אם זה זוהה כמקש מיוחד– תחליף אותו. אחרת תשאיר
