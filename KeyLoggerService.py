@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import List
-import KeyLoggerAgent
 
 
 class IKeyLogger(ABC):
@@ -33,4 +32,3 @@ class KeyLoggerService(IKeyLogger):
  def get_logged_keys(self) -> List[str]:
   #מחזיר עותק (ולא את המקורי)
   return list(self._keys)
-
