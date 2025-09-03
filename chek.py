@@ -20,8 +20,7 @@ special_keys = {
    '\\x03': '<copy >',
    'Key.backspace': '',
    '\\x18': '<cut >',
-   '\\x16': '<paste >'
-}
+   '\\x16': '<paste >'}
 
 #הגדרת סט שמכיל תמיד רק הקשה אחרונה
 pressed_keys = set()
