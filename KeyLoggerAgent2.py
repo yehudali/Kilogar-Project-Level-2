@@ -43,7 +43,7 @@ def on_press(key):
         key = f'{key} '  # מוסיף רווח קדמי
 
     #יצוא ההקשות!
-    print(key)
+    # print(key)
     logged_keys.append (key)
 
 
