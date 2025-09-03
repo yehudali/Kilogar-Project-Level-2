@@ -50,5 +50,7 @@ def on_release(key):
     pressed_keys.discard(key) # הסרה מהסט-בשחרור
 
 listener=Listener(on_press=on_press, on_release=on_release)
-listener.start()
+
+if __name__ ==  "__main__":
+    listener.start()
 # listener.join()
